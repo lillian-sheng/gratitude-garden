@@ -984,35 +984,6 @@
     <div class="archive-head">Your Garden</div>
     <div class="archive-sub">2026 — every entry, every bloom</div>
 
-    <div class="archive-entry" onclick="openEntryModal('mar8')">
-      <div class="entry-date">March 8, Sunday — ✿✿✿ full bloom</div>
-      <div class="entry-item">Morning coffee with golden light</div>
-      <div class="entry-item">My cat curling up next to me</div>
-      <div class="entry-item">The smell of rain on dry earth</div>
-    </div>
-    <div class="archive-entry" onclick="openEntryModal('mar7')">
-      <div class="entry-date">March 7, Saturday — ✿✿✿ full bloom</div>
-      <div class="entry-item">Finishing a book I loved</div>
-      <div class="entry-item">A kind message from a friend</div>
-      <div class="entry-item">Good sleep, finally</div>
-    </div>
-    <div class="archive-entry" onclick="openEntryModal('mar6')">
-      <div class="entry-date">March 6, Friday — ✿✿✿ full bloom</div>
-      <div class="entry-item">Sunlight through the window</div>
-      <div class="entry-item">A surprisingly good lunch</div>
-      <div class="entry-item">The lavender plant is blooming again</div>
-    </div>
-    <div class="archive-entry" onclick="openEntryModal('mar5')">
-      <div class="entry-date">March 5, Thursday — ✿✿✿ full bloom</div>
-      <div class="entry-item">Getting through a hard task</div>
-      <div class="entry-item">The way music can change your mood</div>
-      <div class="entry-item">Fresh sheets</div>
-    </div>
-    <div class="archive-entry" onclick="openEntryModal('mar4')">
-      <div class="entry-date">March 4, Wednesday — ✿✿ partial</div>
-      <div class="entry-item">A really good cup of tea</div>
-      <div class="entry-item">Getting outside for a walk</div>
-    </div>
   </div>
 
   <!-- ── ENTRY DETAIL MODAL ── -->
@@ -1047,43 +1018,7 @@
   })();
 
   /* ── Entry data store ── */
-  const entryData = {
-    mar8: {
-      weekday: 'Sunday',
-      date: 'March 8, 2026',
-      items: ['Morning coffee with golden light', 'My cat curling up next to me', 'The smell of rain on dry earth'],
-      reflection: 'Slow and lovely. The kind of day where nothing remarkable happens but everything feels just right.',
-      flowers: ['🌸', '🌼', '💜']
-    },
-    mar7: {
-      weekday: 'Saturday',
-      date: 'March 7, 2026',
-      items: ['Finishing a book I loved', 'A kind message from a friend', 'Good sleep, finally'],
-      reflection: 'Felt lighter than usual. Stayed in bed a little longer and didn\'t feel guilty about it.',
-      flowers: ['🌸', '🌼', '🌷']
-    },
-    mar6: {
-      weekday: 'Friday',
-      date: 'March 6, 2026',
-      items: ['Sunlight through the window', 'A surprisingly good lunch', 'The lavender plant is blooming again'],
-      reflection: null,
-      flowers: ['🌸', '🌼', '💜']
-    },
-    mar5: {
-      weekday: 'Thursday',
-      date: 'March 5, 2026',
-      items: ['Getting through a hard task', 'The way music can change your mood', 'Fresh sheets'],
-      reflection: 'Harder day but I got through it. Music helped. Grateful for small comforts.',
-      flowers: ['🌸', '🌷', '🌼']
-    },
-    mar4: {
-      weekday: 'Wednesday',
-      date: 'March 4, 2026',
-      items: ['A really good cup of tea', 'Getting outside for a walk'],
-      reflection: null,
-      flowers: ['🌱', '🌱']
-    }
-  };
+  const entryData = {};
 
   /* ── Panel toggles ── */
   function toggleJournal() {
@@ -1275,12 +1210,6 @@
     svg.appendChild(outer);
   }
 
-  /* ── Populate garden from history on load ── */
-  // Must run after flowerDefs and addFlowerToSVG are defined above
-  ;['mar4','mar5','mar6','mar7','mar8'].forEach(key => {
-    const entry = entryData[key];
-    if (entry) entry.items.forEach(item => addFlowerToSVG(item));
-  });
 
   /* ── Submit — plants flowers ── */
   function submitEntry() {
