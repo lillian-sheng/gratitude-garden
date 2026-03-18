@@ -983,7 +983,7 @@
     <button class="archive-close" onclick="toggleArchive()">✕</button>
     <div class="archive-head">Your Garden</div>
     <div class="archive-sub">2026 — every entry, every bloom</div>
-
+    <div id="archiveEntries"></div>
   </div>
 
   <!-- ── ENTRY DETAIL MODAL ── -->
@@ -1054,7 +1054,13 @@
 
     const flowersEl = document.getElementById('modalFlowers');
     const budLabel  = data.items.length < 3 ? ' <span style="font-family:\'DM Sans\',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin-left:6px;">partial bloom</span>' : '';
-    flowersEl.innerHTML = data.flowers.map(f => `<div class="modal-flower-pip">${f}</div>`).join('') + budLabel;
+    if (data.flowers && data.flowers.length) {
+      flowersEl.innerHTML = data.flowers.map(f => `<div class="modal-flower-pip">${f}</div>`).join('') + budLabel;
+      flowersEl.style.display = '';
+    } else {
+      flowersEl.innerHTML = budLabel;
+      flowersEl.style.display = budLabel ? '' : 'none';
+    }
 
     document.getElementById('entryModal').classList.add('open');
   }
@@ -1211,6 +1217,59 @@
   }
 
 
+  /* ── Entry persistence ── */
+  function loadEntries() {
+    try {
+      const raw = localStorage.getItem('gratitude_entries');
+      return raw ? JSON.parse(raw) : {};
+    } catch(e) { return {}; }
+  }
+
+  function saveEntry(items, reflection) {
+    const now = new Date();
+    const weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const day = now.getDate();
+    const suffix = (d => d >= 11 && d <= 13 ? 'th' : ['th','st','nd','rd'][d % 10] || 'th')(day);
+    const key = now.toISOString().split('T')[0]; // e.g. '2026-03-18'
+    const entry = {
+      key,
+      weekday: weekdays[now.getDay()],
+      date: `${months[now.getMonth()]} ${day}${suffix}, ${now.getFullYear()}`,
+      items,
+      reflection: reflection || null
+    };
+    const entries = loadEntries();
+    entries[key] = entry;
+    try { localStorage.setItem('gratitude_entries', JSON.stringify(entries)); } catch(e) {}
+    entryData[key] = entry;
+  }
+
+  function renderArchive() {
+    const entries = loadEntries();
+    const container = document.getElementById('archiveEntries');
+    const keys = Object.keys(entries).sort().reverse(); // newest first
+    if (!keys.length) {
+      container.innerHTML = '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:var(--ink-soft);padding:16px 0;opacity:0.6;letter-spacing:0.04em;">No entries yet.</div>';
+      return;
+    }
+    container.innerHTML = keys.map(key => {
+      const e = entries[key];
+      return `<div class="archive-entry" onclick="openEntryModal('${key}')">
+        <div class="entry-date">${e.weekday}, ${e.date}</div>
+        ${e.items.map(item => `<div class="entry-item">${item}</div>`).join('')}
+      </div>`;
+    }).join('');
+  }
+
+  function populateGardenFromHistory() {
+    const entries = loadEntries();
+    Object.keys(entries).sort().forEach(key => {
+      entryData[key] = entries[key];
+      entries[key].items.forEach(item => addFlowerToSVG(item));
+    });
+  }
+
   /* ── Submit — plants flowers ── */
   function submitEntry() {
     const fields = [...document.querySelectorAll('.field-input')];
@@ -1225,6 +1284,9 @@
     document.getElementById('journalPanel').classList.remove('open');
 
     const tips = filled.map(f => f.value.trim());
+    const reflection = document.querySelector('.reflection-input').value.trim();
+    saveEntry(tips, reflection || null);
+    renderArchive();
     saveDraft();
 
     tips.forEach((tip, i) => {
@@ -1340,6 +1402,10 @@
       return data.date === new Date().toDateString() ? (data.fieldValues || {}) : {};
     } catch(e) { return {}; }
   }
+
+  // Populate garden and archive from saved entries
+  populateGardenFromHistory();
+  renderArchive();
 
   // Defer slightly so we run after any browser form-state restoration
   setTimeout(restoreDraft, 50);
